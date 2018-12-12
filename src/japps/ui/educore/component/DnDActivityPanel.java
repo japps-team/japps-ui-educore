@@ -68,7 +68,7 @@ public class DnDActivityPanel extends ActivityPanel{
         leftPanel.setBorder(BorderFactory.createEmptyBorder());
         rightPanel.setBorder(BorderFactory.createEmptyBorder());
         setComponents(new Component[][]{{scroll,rightPanel}}, 
-                new String[]{Panel.CENTER,Panel.FILL_GROW_CENTER}, new String[]{Panel.FILL_GROW_CENTER});
+                new String[]{"250:250:250,"+Panel.FILL,Panel.FILL_GROW_CENTER}, new String[]{Panel.FILL_GROW_CENTER});
     }
     
     
@@ -117,13 +117,8 @@ public class DnDActivityPanel extends ActivityPanel{
             b.setOption(o);
             b.setDndMode(Dnd.DRAGGABLE);
             b.setAction((e)->{
-                try {
                     String text = Const.DND.getText(o);
-                    Path speech = Resources.getSpeech(text);
-                    Sound.play(speech);
-                } catch (Exception err) {
-                    Log.debug("Cant speech text button", err);
-                }
+                    Resources.speech(text);
             });
             compsLeft[i][0]= b;
             i++;

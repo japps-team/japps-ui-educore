@@ -57,6 +57,7 @@ public class Const {
     public static final String IMAGE = "image";
     public static final String WIDTH = "image";
     public static final String HEIGHT = "image";
+    public static final String HORIZONTAL = "horizontal";
     
     public static class LEARNING{
         public static String    getTitle(ActivityOption activity){     return activity.get(    TITLE); }
@@ -82,10 +83,12 @@ public class Const {
         public static String    getText(ActivityOption option){        return option.get(      TEXT);}
         public static boolean   isSpeechText(ActivityOption option){   return option.getBool(SPEECH_TEXT);}
         public static Path      getSuccessImage(ActivityOption option){return option.getPath(  SUCCESS_IMAGE);}
+        public static String    getFinalText(ActivityOption option){   return option.get(FINAL_TEXT);}
         
-        public static void activity(Activity activity, String title, String textOnComplete, Path successImage, boolean speechText){
+        public static void activity(Activity activity, String title, String text, String finalText, Path successImage, boolean speechText){
             activity.set(TITLE, title);
-            activity.set(TEXT, textOnComplete);
+            activity.set(TEXT, text);
+            activity.set(FINAL_TEXT, finalText);
             activity.set(SUCCESS_IMAGE, successImage);
             activity.set(SPEECH_TEXT,speechText);
         }
@@ -175,6 +178,7 @@ public class Const {
         //public static boolean   isSpeechText(ActivityOption option){   return option.getBool(SPEECH_TEXT);}
         //public static Path      getSuccessImage(ActivityOption option){return option.getPath(  SUCCESS_IMAGE);}
         public static String    getPairOptionId(ActivityOption option){return option.get(PAIR_OPTION_ID); }
+        public static boolean   isHorizontal(Activity a){return a.getBool(HORIZONTAL);}
         
         /**
          * Set values to an activity option
@@ -183,6 +187,7 @@ public class Const {
          * @param text Const.TEXT
          * @param speechText Const.SPEECH_TEXT
          * @param pairOptionId
+         * @param horizontal
          */
         public static void option(ActivityOption option, Path thumbnail, String text, boolean speechText, String pairOptionId){
             option.set(THUMBNAIL, thumbnail);
@@ -197,10 +202,11 @@ public class Const {
          * @param thumbnailWidth
          * @param thumbnailHeight 
          */
-        public static void activity(Activity activity, int thumbnailWidth, int thumbnailHeight){
+        public static void activity(Activity activity, int thumbnailWidth, int thumbnailHeight,boolean horizontal){
             activity.set(ACTIVITY_PANEL_CLASS, ConnectActivityPanel.class.getName());
             activity.set(THUMBNAIL_WIDTH, thumbnailWidth);
             activity.set(THUMBNAIL_HEIGHT, thumbnailHeight);
+            activity.set(HORIZONTAL, horizontal);
         }
 
     }

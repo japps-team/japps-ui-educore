@@ -182,7 +182,7 @@ public class LearningPanel extends Panel{
         String title = activity.get(Const.TITLE);
 
         try{
-            
+            int stateBefor = activity.getState();
             currentActivityPanel = activityPanels.get(activity);
             activityContainer.setComponents(new Component[][]{{currentActivityPanel}});
             
@@ -199,6 +199,12 @@ public class LearningPanel extends Panel{
                 currentActivityPanel.start();
             }
             activityContainer.repaint();
+            
+            
+            if(stateBefor == Activity.NONSTARTED){
+                SwingUtilities.invokeLater(()->{launchOnStart();});
+            }
+            
         }catch(Exception e){
             Log.debug("Cant find class name", e);
         }
@@ -220,6 +226,27 @@ public class LearningPanel extends Panel{
         
     }
     
+    private void launchOnStart(){
+        try {
+            
+            refreshControlButtons();
+            
+            ActivityPanel currentActivityPanel = LearningPanel.this.currentActivityPanel;
+            
+            String text = Const.COMMON.getText(currentActivityPanel.getActivity());
+
+            if (Const.COMMON.isSpeechText(currentActivityPanel.getActivity())) {
+                Resources.speech(text);
+            }
+            
+            if((text!=null && !text.isEmpty())){
+                Dialogs.message(Const.COMMON.getTitle(currentActivityPanel.getActivity()), text, Resources.icon("info.png", 100, 100));
+            }
+
+        } catch (Exception e) {
+            Log.debug("Error on launchOnStart method", e);
+        }
+    }
     
      /**
      * Method launched when Activity is completed
@@ -231,9 +258,11 @@ public class LearningPanel extends Panel{
             refreshControlButtons();
             
             ActivityPanel currentActivityPanel = LearningPanel.this.currentActivityPanel;
+            
+            String text = Const.COMMON.getFinalText(currentActivityPanel.getActivity());
 
             if (Const.COMMON.isSpeechText(currentActivityPanel.getActivity())) {
-                Resources.speech(Const.COMMON.getText(currentActivityPanel.getActivity()));
+                Resources.speech(text);
             }
             
             Image image = null;
@@ -247,10 +276,8 @@ public class LearningPanel extends Panel{
                 Log.debug("Cant find successImage ",e);
             }
             
-            String text = Const.COMMON.getText(currentActivityPanel.getActivity());
-            
             if((text!=null && !text.isEmpty()) || image!=null){
-                Dialogs.message(Const.COMMON.getTitle(currentActivityPanel.getActivity()), Const.COMMON.getText(currentActivityPanel.getActivity()),image);
+                Dialogs.message(Const.COMMON.getTitle(currentActivityPanel.getActivity()),text,image);
             }
 
         } catch (Exception e) {

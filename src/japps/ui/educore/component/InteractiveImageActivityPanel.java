@@ -122,14 +122,8 @@ public class InteractiveImageActivityPanel extends ActivityPanel{
     private void speechText(ActivityOption o){
         Sound.stop();
         if(isSpeechText(o)){
-        String text = getText(o);       
-            if(text != null){
-                try {
-                    Sound.play(Resources.getSpeech(text));
-                } catch (Exception e) {
-                    Log.debug("Cant play text speech: "+text);
-                }
-            }
+            String text = getText(o);       
+            Resources.speech(text);
         }
     }
     

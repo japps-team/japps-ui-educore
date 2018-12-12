@@ -36,6 +36,7 @@ import static japps.ui.educore.object.Const.MEMORY.getTitle;
 import static japps.ui.educore.object.Const.MEMORY.isSpeechText;
 import japps.ui.util.Log;
 import japps.ui.util.Resources;
+import japps.ui.util.Sound;
 import japps.ui.util.Util;
 import java.awt.Image;
 import java.nio.file.Path;
@@ -56,6 +57,7 @@ public class ConnectActivityPanel extends ActivityPanel{
     private List<Card> leftCards;
     private List<Card> rightCards;
     private Card lastCard;
+    private boolean horizontal = false;
     
     private List<Card[]> errors = new ArrayList<>();
     
@@ -97,6 +99,8 @@ public class ConnectActivityPanel extends ActivityPanel{
         card.button.setImage(card.frontImage);
         card.button.setBorder(BorderFactory.createEmptyBorder());
         card.button.setAction((e)->{ selectCard(card); });
+        card.button.setHorizontalAlignment(Button.CENTER);
+        card.button.setVerticalAlignment(Button.CENTER);
         card.setEnable(true);
         return card;
     }
@@ -197,16 +201,26 @@ public class ConnectActivityPanel extends ActivityPanel{
             if(c.completed){
                 g.setColor(Color.GREEN);
                 int x1,y1,x2,y2;
-                x1 = c.button.getX()+c.button.getWidth();
-                y1 = c.button.getY()+c.button.getHeight()/2;
-                x2 = c.pair.button.getX();
-                y2 = c.pair.button.getY()+c.pair.button.getHeight()/2;
-                g.drawLine(x1, y1, x2, y2);
-                g.drawLine(x1, y1+1, x2, y2+1);
-                g.drawLine(x1, y1+2, x2, y2+2);
-                g.drawLine(x1, y1+3, x2, y2+3);
-                g.drawLine(x1, y1+4, x2, y2+4);
-                g.drawLine(x1, y1+5, x2, y2+5);
+                if(horizontal){
+                    x1 = c.button.getX()+c.button.getWidth()/2;
+                    y1 = c.button.getY()+c.button.getHeight();
+                    x2 = c.pair.button.getX()+c.pair.button.getWidth()/2;
+                    y2 = c.pair.button.getY();
+                    g.drawLine(x1, y1, x2, y2);
+                    g.drawLine(x1+1, y1, x2+1, y2);
+                    g.drawLine(x1+2, y1, x2+2, y2);
+                    g.drawLine(x1+3, y1, x2+3, y2);
+                }else{
+                    x1 = c.button.getX()+c.button.getWidth()/2;
+                    y1 = c.button.getY()+c.button.getHeight()/2;
+                    x2 = c.pair.button.getX();
+                    y2 = c.pair.button.getY()+c.pair.button.getHeight()/2;
+                    g.drawLine(x1, y1, x2, y2);
+                    g.drawLine(x1, y1+1, x2, y2+1);
+                    g.drawLine(x1, y1+2, x2, y2+2);
+                    g.drawLine(x1, y1+3, x2, y2+3);
+                }
+                
             }
         }
         
@@ -244,31 +258,63 @@ public class ConnectActivityPanel extends ActivityPanel{
         
         cardHeight = getThumbnailHeight(a);
         cardWidth  = getThumbnailWidth(a);
-
+        horizontal = isHorizontal(a);
         
         
         createCards(a);
-        Component[][] comps = new Component[leftCards.size()][3];
         
-        leftCards.stream().forEach((left) -> {
-            int pos;
-            do{
-                pos = (int)(Math.random()*comps.length);
-            }while(comps[pos][0]!=null);
-            comps[pos][0] = left.button;
-        });
+        if(horizontal){
+        
+            Component[][] comps = new Component[3][leftCards.size()];
 
-        rightCards.stream().forEach((right) -> {
-            int pos;
-            do{
-                pos = (int)(Math.random()*comps.length);
-            }while(comps[pos][2]!=null);
-            comps[pos][2] = right.button;
-        });
-        
-        
-        setComponents(comps,
-                new String[]{ Panel.NONE, Panel.FILL_GROW_CENTER, Panel.NONE },null);
+            leftCards.stream().forEach((left) -> {
+                int pos;
+                do{
+                    pos = (int)(Math.random()*leftCards.size());
+                }while(comps[0][pos]!=null);
+                comps[0][pos] = left.button;
+            });
+
+            rightCards.stream().forEach((right) -> {
+                int pos;
+                do{
+                    pos = (int)(Math.random()*leftCards.size());
+                }while(comps[2][pos]!=null);
+                comps[2][pos] = right.button;
+            });
+            
+            String[] rowConst = new String[leftCards.size()];
+            for(int i=0;i<rowConst.length;i++){
+                rowConst[i] = Panel.FILL_GROW_CENTER;
+            }
+
+
+            setComponents(comps,
+                    rowConst, new String[]{ Panel.NONE, Panel.FILL_GROW_CENTER, Panel.NONE });
+
+        }else{
+            Component[][] comps = new Component[leftCards.size()][3];
+
+            leftCards.stream().forEach((left) -> {
+                int pos;
+                do{
+                    pos = (int)(Math.random()*comps.length);
+                }while(comps[pos][0]!=null);
+                comps[pos][0] = left.button;
+            });
+
+            rightCards.stream().forEach((right) -> {
+                int pos;
+                do{
+                    pos = (int)(Math.random()*comps.length);
+                }while(comps[pos][2]!=null);
+                comps[pos][2] = right.button;
+            });
+
+
+            setComponents(comps,
+                    new String[]{ Panel.NONE, Panel.FILL_GROW_CENTER, Panel.NONE },null);
+        }
     }
 
     @Override
@@ -294,6 +340,16 @@ public class ConnectActivityPanel extends ActivityPanel{
             this.completed = true;
             this.button.setEnabled(false);
             ConnectActivityPanel.this.repaint();
+            
+            try {
+                String text = getText(option);
+                if(isSpeechText(option) && left && text != null && !text.isEmpty()){
+                    Resources.speech(text);
+                }
+                
+            } catch (Exception e) {
+            }
+            
         }
         
         

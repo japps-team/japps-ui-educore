@@ -150,6 +150,8 @@ public class ReadActivityPanel extends ActivityPanel{
         
         
         if(currentOption>=getActivity().getOptions().size()){
+            if(mediaComponent != null) mediaComponent.stop();
+            Sound.stop();
             getActivity().setState(Activity.COMPLETED);
             return;
         }else if(currentOption<0){
@@ -187,8 +189,7 @@ public class ReadActivityPanel extends ActivityPanel{
             lbText.setText(((text!=null)?"<html>"+text+"</html>":""));
             lbText.setFont(font);
             if(speechText && text!=null && !text.isEmpty()){
-                Path p = Resources.getSpeech(text);
-                Sound.play(p);
+                Resources.speech(text);
             }
 
             

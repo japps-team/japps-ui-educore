@@ -34,6 +34,7 @@ import java.nio.file.Path;
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 import static japps.ui.educore.object.Const.CHOOSE.*;
+import japps.ui.util.Resources;
 import java.awt.Component;
 
 /**
@@ -95,12 +96,7 @@ public class ChooseActivityPanel extends ActivityPanel{
         String title = getTitle(option);
         
         if(text!=null && !text.isEmpty() && isSpeechText(option)){
-            try {
-                Path p =getSpeech(text);
-                Sound.play(p);
-            } catch (Exception e) {
-                Log.debug("Cant play the sound in ChooseActivity",e);
-            }
+            Resources.speech(text);
         }else{
             if(mediaType==Media.SOUND){
                 mediaDialog.setSize(400, 100);
