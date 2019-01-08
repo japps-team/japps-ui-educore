@@ -3,15 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/fernando/NetBeansProjects/japps-ui-educore/src/japps/ui/educore/component/ChooseActivityPanel.java</file>
-            <file>file:/home/fernando/NetBeansProjects/japps-ui-educore/src/japps/ui/educore/component/ReadActivityPanel.java</file>
-            <file>file:/home/fernando/NetBeansProjects/japps-ui-educore/src/japps/ui/educore/object/Const.java</file>
+            <file>file:/home/fernando/NetBeansProjects/japps-ui-educore/src/japps/ui/educore/LearningListPanel.java</file>
             <file>file:/home/fernando/NetBeansProjects/japps-ui-educore/src/japps/ui/educore/component/LearningPanel.java</file>
-            <file>file:/home/fernando/NetBeansProjects/japps-ui-educore/src/japps/ui/educore/component/ConnectActivityPanel.java</file>
-            <file>file:/home/fernando/NetBeansProjects/japps-ui-educore/src/japps/ui/educore/component/ActivityPanel.java</file>
-            <file>file:/home/fernando/NetBeansProjects/japps-ui-educore/src/japps/ui/educore/object/Activity.java</file>
-            <file>file:/home/fernando/NetBeansProjects/japps-ui-educore/src/japps/ui/educore/component/DnDActivityPanel.java</file>
-            <file>file:/home/fernando/NetBeansProjects/japps-ui-educore/src/japps/ui/educore/component/InteractiveImageActivityPanel.java</file>
+            <file>file:/home/fernando/NetBeansProjects/japps-ui-educore/src/japps/ui/educore/EducoreMain.java</file>
+            <file>file:/home/fernando/NetBeansProjects/japps-ui-educore/src/japps/ui/educore/EducoreConfig.java</file>
+            <file>file:/home/fernando/NetBeansProjects/japps-ui-educore/src/japps/ui/educore/object/ActivityOption.java</file>
+            <file>file:/home/fernando/NetBeansProjects/japps-ui-educore/src/japps/ui/educore/component/InputTextActivityPanel.java</file>
         </group>
     </open-files>
 </project-private>

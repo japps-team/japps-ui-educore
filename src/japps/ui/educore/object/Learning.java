@@ -94,6 +94,7 @@ public class Learning extends ActivityOption{
                 String optionIds[] = optionString.split("[,]");
                 for(String optionId : optionIds){
                     Activity option = new Activity(optionId.trim(), properties);
+                    option.parent = this;
                     activities.add(option);
                 }
             }
@@ -103,7 +104,7 @@ public class Learning extends ActivityOption{
     }
     
     /**
-     * Adds a new activity option and return it
+     * Adds a new activity  and return it
      * add a standar id to the returned option
      * @return 
      */
@@ -138,7 +139,7 @@ public class Learning extends ActivityOption{
      * @param id
      * @return 
      */
-    public ActivityOption getActivitynById(String id){
+    public Activity getActivityById(String id){
         List<Activity> l = getActivities();
         for(Activity o : l){
             if(o.id.equals(id)){

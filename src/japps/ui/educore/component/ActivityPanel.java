@@ -17,19 +17,11 @@
  */
 package japps.ui.educore.component;
 
-import japps.ui.DesktopApp;
 import japps.ui.component.Panel;
 import japps.ui.educore.object.Activity;
-import static japps.ui.educore.object.Const.MEMORY.getSuccessImage;
-import static japps.ui.educore.object.Const.MEMORY.getText;
-import static japps.ui.educore.object.Const.MEMORY.getTitle;
-import static japps.ui.educore.object.Const.MEMORY.isSpeechText;
 import japps.ui.util.Log;
-import japps.ui.util.Resources;
 import japps.ui.util.Sound;
-import japps.ui.util.Util;
-import java.awt.Image;
-import java.nio.file.Path;
+
 
 /**
  *

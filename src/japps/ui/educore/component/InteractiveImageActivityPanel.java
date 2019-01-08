@@ -106,7 +106,8 @@ public class InteractiveImageActivityPanel extends ActivityPanel{
             b.setToolTipText(title);
             b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             b.setCommand(o.getId());
-            b.setAction((e)->{ launchOption(e);});
+            b.setMarkSelection(null);
+            b.addActionListener((e)->{ launchOption(e);});
             b.addMouseListener(new AbstractMouseListener(){
                 @Override
                 public void mouseEntered(MouseEvent e) {
@@ -123,7 +124,7 @@ public class InteractiveImageActivityPanel extends ActivityPanel{
         Sound.stop();
         if(isSpeechText(o)){
             String text = getText(o);       
-            Resources.speech(text);
+            Resources.speech(text,false);
         }
     }
     

@@ -98,7 +98,7 @@ public class ConnectActivityPanel extends ActivityPanel{
         card.option = o;
         card.button.setImage(card.frontImage);
         card.button.setBorder(BorderFactory.createEmptyBorder());
-        card.button.setAction((e)->{ selectCard(card); });
+        card.button.addActionListener((e)->{ selectCard(card); });
         card.button.setHorizontalAlignment(Button.CENTER);
         card.button.setVerticalAlignment(Button.CENTER);
         card.setEnable(true);
@@ -139,20 +139,21 @@ public class ConnectActivityPanel extends ActivityPanel{
     private void selectCard(Card card){
         
         if(card == lastCard){
+            lastCard.setSelected(false);
             lastCard = null;
             return;
         }
         
         if(lastCard==null){
             lastCard = card;
-            //lastCard.button.setSelected(true);
+            lastCard.setSelected(true);
             return;
         }
         
         if(card.left == lastCard.left){
-            lastCard.reset();
+            lastCard.setSelected(false);
             lastCard = card;
-            //lastCard.button.setSelected(true);
+            lastCard.setSelected(true);
             return;
         }
         
@@ -160,7 +161,7 @@ public class ConnectActivityPanel extends ActivityPanel{
             lastCard.complete();
             card.complete();
             lastCard.button.setSelected(true);
-            //card.button.setSelected(true);
+            card.button.setSelected(true);
             lastCard = null;
             if(countPending() == 0){
                 getActivity().setState(Activity.COMPLETED);
@@ -169,10 +170,9 @@ public class ConnectActivityPanel extends ActivityPanel{
         }else{
             
             
-            lastCard.reset();
-            card.reset();
+            lastCard.setSelected(false);
+            card.setSelected(false);
             errors.add(new Card[]{ lastCard,card  });
-            
             lastCard = null;
             ConnectActivityPanel.this.repaint();
 
@@ -229,16 +229,25 @@ public class ConnectActivityPanel extends ActivityPanel{
             Card p = lastError[1];
                 g.setColor(Color.RED);
                 int x1,y1,x2,y2;
-                x1 = c.button.getX()+c.button.getWidth();
-                y1 = c.button.getY()+c.button.getHeight()/2;
-                x2 = p.button.getX();
-                y2 = p.button.getY()+p.button.getHeight()/2;
-                g.drawLine(x1, y1, x2, y2);
-                g.drawLine(x1, y1+1, x2, y2+1);
-                g.drawLine(x1, y1+2, x2, y2+2);
-                g.drawLine(x1, y1+3, x2, y2+3);
-                g.drawLine(x1, y1+4, x2, y2+4);
-                g.drawLine(x1, y1+5, x2, y2+5);
+                if(horizontal){
+                    x1 = c.button.getX()+c.button.getWidth()/2;
+                    y1 = c.button.getY()+c.button.getHeight();
+                    x2 = p.button.getX()+p.button.getWidth()/2;
+                    y2 = p.button.getY();
+                    g.drawLine(x1, y1, x2, y2);
+                    g.drawLine(x1+1, y1, x2+1, y2);
+                    g.drawLine(x1+2, y1, x2+2, y2);
+                    g.drawLine(x1+3, y1, x2+3, y2);
+                }else{
+                    x1 = c.button.getX()+c.button.getWidth()/2;
+                    y1 = c.button.getY()+c.button.getHeight()/2;
+                    x2 = p.button.getX();
+                    y2 = p.button.getY()+p.button.getHeight()/2;
+                    g.drawLine(x1, y1, x2, y2);
+                    g.drawLine(x1, y1+1, x2, y2+1);
+                    g.drawLine(x1, y1+2, x2, y2+2);
+                    g.drawLine(x1, y1+3, x2, y2+3);
+                }
          }
         
     }
@@ -344,7 +353,7 @@ public class ConnectActivityPanel extends ActivityPanel{
             try {
                 String text = getText(option);
                 if(isSpeechText(option) && left && text != null && !text.isEmpty()){
-                    Resources.speech(text);
+                    Resources.speech(text,true);
                 }
                 
             } catch (Exception e) {
@@ -363,9 +372,12 @@ public class ConnectActivityPanel extends ActivityPanel{
             this.completed = false;
             this.button.setEnabled(true);
             this.button.setSelected(false);
-            this.button.setBorder(BorderFactory.createEmptyBorder());
             ConnectActivityPanel.this.repaint();
             ConnectActivityPanel.this.revalidate();
+        }
+        
+        public void setSelected(boolean selected){
+            this.button.setSelected(selected);
         }
         
         

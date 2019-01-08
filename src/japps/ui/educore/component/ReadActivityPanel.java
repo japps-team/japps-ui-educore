@@ -189,7 +189,7 @@ public class ReadActivityPanel extends ActivityPanel{
             lbText.setText(((text!=null)?"<html>"+text+"</html>":""));
             lbText.setFont(font);
             if(speechText && text!=null && !text.isEmpty()){
-                Resources.speech(text);
+                Resources.speech(text,false);
             }
 
             

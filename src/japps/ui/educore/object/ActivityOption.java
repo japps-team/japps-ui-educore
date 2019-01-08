@@ -18,6 +18,7 @@
 package japps.ui.educore.object;
 
 import japps.ui.util.Log;
+import japps.ui.util.Resources;
 import java.awt.Font;
 import java.io.File;
 import java.nio.file.Path;
@@ -26,8 +27,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import jdk.nashorn.internal.runtime.regexp.joni.ast.ConsAltNode;
 
 /**
  * 
@@ -45,6 +48,8 @@ public class ActivityOption{
     
     protected Map properties;
     protected String id;
+    
+    private boolean completed;
     
     
     
@@ -73,12 +78,55 @@ public class ActivityOption{
      * @return 
      */
     public String get(Object key) {
+        return get(key,true);
+    }
+    
+    /**
+     * Get a key in this activity option
+     * @param key
+     * @return 
+     */
+    public String get(Object key,boolean replaceInputs) {
         String v = (String)properties.get(id+"."+key);
-        if(v!=null && v.equals("null")){
+        if(v==null || v.equals("null")){
             return null;
         }
+        
+        if(replaceInputs){
+            ActivityOption learning = this;
+            if (!(learning instanceof Learning)) {
+                learning = learning.getParent();
+                if (!(learning instanceof Learning)) {
+                    learning = learning.getParent();
+                }
+            }
+            
+            if(learning != null && (learning instanceof Learning)){
+                List<Activity> activities = ((Learning)learning).getActivities();
+                if(activities !=null){
+                    for(Activity a: activities){
+                        List<ActivityOption> options = a.getOptions();
+                        if(options !=null){
+                            for(ActivityOption o : options){
+                                String inputName = o.get(Const.INPUT_NAME,false);
+                                String input     = o.get(Const.INPUT,false);
+                                if(inputName != null){
+                                    input = input==null?"":input;
+                                    v = v.replaceAll("[{]"+inputName+"[}]", input);
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            }
+            
+        }
+        
         return v;
     }
+    
+    
 
     /**
      * Set a property in this activity option
@@ -127,7 +175,7 @@ public class ActivityOption{
      * @return 
      */
     public boolean getBool(String propertyName){
-        String v = get(propertyName);
+        String v = get(propertyName,false);
         if(v!=null){
             return Boolean.parseBoolean(v.toLowerCase());
         }
@@ -141,7 +189,7 @@ public class ActivityOption{
      * @return 
      */
     public int getInt(String propertyName){
-        String v = get(propertyName);
+        String v = get(propertyName,false);
         if(v!=null){
             return Integer.parseInt(v);
         }
@@ -155,7 +203,7 @@ public class ActivityOption{
      * @return 
      */
     public double getDouble(String propertyName){
-        String v = get(propertyName);
+        String v = get(propertyName,false);
         if(v!=null){
             return Double.parseDouble(v);
         }
@@ -169,7 +217,7 @@ public class ActivityOption{
      * @throws ParseException 
      */
     public Date getDate(String propertyName) throws ParseException{
-        String v = get(propertyName);
+        String v = get(propertyName,false);
         if(v!=null){
             return dateFormat.parse(v);
         }
@@ -183,7 +231,7 @@ public class ActivityOption{
      * @return 
      */
     public Font getFont(String propertyName){
-        String v = get(propertyName);
+        String v = get(propertyName,false);
         if(v!=null){
             return Font.decode(v);
         }
@@ -197,10 +245,17 @@ public class ActivityOption{
      * @return 
      */
     public Path getPath(String key){
-        String v = get(key);
+        String v = get(key,false);
         if(v==null) return null;
         v = v.replaceAll("[/]", File.separator);
-        return Paths.get(v);
+        Path p=null;
+        try{
+         p = Resources.getUserAppPath().resolve(v);
+        }catch(Exception err){
+            Log.debug("Error resolvin path: "+v, err);
+        }
+        System.out.println("Accessing path: "+p.toString());
+        return p;
     }
 
     @Override
@@ -237,6 +292,27 @@ public class ActivityOption{
      */
     public ActivityOption getParent() {
         return parent;
+    }
+
+    /**
+     * Whether this learning/activity/option is completed or not
+     * @return 
+     */
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    /**
+     * whether this learning/activity/option is completed or not
+     * @param completed 
+     */
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
+    @Override
+    public String toString() {
+        return getId() + " - " + get(Const.TEXT) + get(Const.TITLE);
     }
 
     

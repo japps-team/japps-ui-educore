@@ -21,9 +21,12 @@ import japps.ui.DesktopApp;
 import japps.ui.component.Button;
 import japps.ui.component.Dialogs;
 import japps.ui.component.Media;
+import japps.ui.component.SelectionGroup;
 import japps.ui.component.ToggleButton;
 import japps.ui.educore.object.Activity;
+import japps.ui.educore.object.ActivityListener;
 import japps.ui.educore.object.ActivityOption;
+import japps.ui.educore.object.Const;
 import japps.ui.util.Log;
 import japps.ui.util.Util;
 import static japps.ui.util.Resources.*;
@@ -46,6 +49,7 @@ public class ChooseActivityPanel extends ActivityPanel{
     JDialog mediaDialog;
     Media mediaPanel;
     ToggleButton[][] cards;
+    SelectionGroup group;
 
     /**
      * Creates new activity panel
@@ -88,6 +92,8 @@ public class ChooseActivityPanel extends ActivityPanel{
      */
     private void launchOption(ToggleButton button, ActivityOption option){
         
+        getActivity().set(Const.INPUT, option.getId());
+        
         button.setSelected(true);
         
         Path media = getMedia(option);
@@ -96,7 +102,7 @@ public class ChooseActivityPanel extends ActivityPanel{
         String title = getTitle(option);
         
         if(text!=null && !text.isEmpty() && isSpeechText(option)){
-            Resources.speech(text);
+            Resources.speech(text,true);
         }else{
             if(mediaType==Media.SOUND){
                 mediaDialog.setSize(400, 100);
@@ -112,7 +118,7 @@ public class ChooseActivityPanel extends ActivityPanel{
             mediaDialog.setVisible(true);
         }
         
-        if(countPending()==0){
+        if(countPending()==0 || !isMultiselection(getActivity())){
             getActivity().setState(Activity.COMPLETED);
         }
         
@@ -139,11 +145,13 @@ public class ChooseActivityPanel extends ActivityPanel{
         
         int r= 0, c=0;
         
+        group = isMultiselection(activity)?null:new SelectionGroup();
+        
         for(ActivityOption option : activity.getOptions()){
             Path thumb = getThumbnail(option);
             ToggleButton button = new ToggleButton();
             button.setCommand(option.getId());
-            button.setAction((e)->{ 
+            button.addActionListener((e)->{ 
                 launchOption(button,option);
             });
             button.setText(getTitle(option));
@@ -154,6 +162,8 @@ public class ChooseActivityPanel extends ActivityPanel{
             if(thumb!=null){
                 button.setImage(Util.readImage(thumb),width,height);
             }
+            
+            if(group !=null ) group.add(button);
             
             cards[r][c] = button;
             c++;            

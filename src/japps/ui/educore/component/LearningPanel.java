@@ -54,12 +54,12 @@ public class LearningPanel extends Panel{
     private Label  lblTitle;
     private Map<Activity,ActivityPanel> activityPanels;
     private ActivityPanel currentActivityPanel;
-    private Panel panelStart;
-    private Panel panelEnd;
+
     
-    private int currentActivity = 0;
-    
+    private Activity current;
     private Learning learning;
+    
+    private int countActivities;
     
     
     
@@ -106,12 +106,17 @@ public class LearningPanel extends Panel{
     public void setLearning(Learning learning) {
         this.learning = learning;
         this.activityPanels = new HashMap<>();
-        if(this.learning != null && this.learning.getActivities() != null){
+        if(this.learning != null && this.learning.getActivities() != null && !this.learning.getActivities().isEmpty()){
             
             DesktopApp.APP.setFullscreen(true);
             
-            
+            countActivities = 0;
             for(Activity a : learning.getActivities()){
+                
+                
+                countActivities++;
+                a.set("INDEX", countActivities);
+                
                 //Setting listener to the activity
                 List<ActivityListener> listeners = a.getActivityListeners();
                 boolean already = false;
@@ -149,52 +154,60 @@ public class LearningPanel extends Panel{
      * Shows next activity
      */
     private void nextActivity(){
-        currentActivity++;
-        setCurrentActivity();
+        int id = 0;
+        if(current != null) id = learning.getActivities().indexOf(current);
+        if(id+1>=learning.getActivities().size()){
+            refreshControlButtons();
+            return;
+        }else{
+            id = (id+1);
+        }
+        Activity next = learning.getActivities().get(id);       
+        next.set("previousId", current.getId());
+        setActivity(next);
     }
     
     /**
      * Show previous activity
      */
     private void previousActivity(){
-        currentActivity--;
-        setCurrentActivity();
+        if (current == null) return;
+        String previousId = current.get("previousId");
+        
+        if (previousId == null) return;
+        Activity previous = (Activity)learning.getActivityById(previousId);
+        
+        if(previous == null) return;
+        
+        setActivity(previous);
     }
     
     /**
      * Shows the currentActivity
      */
-    private void setCurrentActivity(){
+    private void setActivity(Activity activity){
         
-        if(learning == null || learning.getActivities()==null || learning.getActivities().isEmpty()){
-            Log.debug("There is not Learning object or options are empty");
+        this.current = activity;
+        //int currentId = learning.getActivities().indexOf(this.current);
+        
+        if(activity == null){
+            Log.debug("Activity is null");
             return;
         }
-        
-        Activity activity = learning.getActivities().get(currentActivity);
         
         refreshControlButtons();
         
         if(currentActivityPanel != null){
-            currentActivityPanel.stop();
+            currentActivityPanel.stop();    
         }
         
-        String title = activity.get(Const.TITLE);
-
+        
+        //String title = activity.get(Const.TITLE);
         try{
             int stateBefor = activity.getState();
             currentActivityPanel = activityPanels.get(activity);
             activityContainer.setComponents(new Component[][]{{currentActivityPanel}});
-            
-            if(activity.getState() == Activity.COMPLETED){
-                lblTitle.setText(title+ " ("+Resources.$("Completed")+")");
-            }else{
-                lblTitle.setText(title);
-            }
-            
-            lblStatus.setText((currentActivity+1)+"/"+learning.getActivities().size());
-            
-            
+
             if(currentActivityPanel.getActivity().getState()!=Activity.STARTED){
                 currentActivityPanel.start();
             }
@@ -202,7 +215,7 @@ public class LearningPanel extends Panel{
             
             
             if(stateBefor == Activity.NONSTARTED){
-                SwingUtilities.invokeLater(()->{launchOnStart();});
+                SwingUtilities.invokeLater(()->{launchOnActivityStart();});
             }
             
         }catch(Exception e){
@@ -211,22 +224,38 @@ public class LearningPanel extends Panel{
     }
     
     private void refreshControlButtons(){
+        int currentId = 0;
         
-        Activity activity = learning.getActivities().get(currentActivity);
+        if(current != null){
+            currentId = learning.getActivities().indexOf(current);
+        }
         
         boolean prev = true;
         boolean next = true;
         
-        if(isWaitUntilComplete(learning) && activity.getState() != Activity.COMPLETED){
+        if(Const.COMMON.isWaitUntilComplete(current) && current!=null && current.getState() != Activity.COMPLETED){
                 next = false;
         }
         
-        btnNext.setEnabled(next && (currentActivity<(learning.getActivities().size()-1)));
-        btnPrevious.setEnabled(prev && currentActivity>0);
         
+        btnNext.setEnabled(next && (currentId<(learning.getActivities().size()-1)));
+        btnPrevious.setEnabled(prev && currentId>0);
+        
+        
+        if (current != null) {
+
+            if (current.getState() == Activity.COMPLETED) {
+                lblTitle.setText(Const.COMMON.getTitle(current) + " (" + Resources.$("Completed") + ")");
+            } else {
+                lblTitle.setText(Const.COMMON.getTitle(current));
+            }
+
+            lblStatus.setText(current.getInt("INDEX") + "/" + countActivities);
+        }
+
     }
     
-    private void launchOnStart(){
+    private void launchOnActivityStart(){
         try {
             
             refreshControlButtons();
@@ -236,7 +265,7 @@ public class LearningPanel extends Panel{
             String text = Const.COMMON.getText(currentActivityPanel.getActivity());
 
             if (Const.COMMON.isSpeechText(currentActivityPanel.getActivity())) {
-                Resources.speech(text);
+                Resources.speech(text,false);
             }
             
             if((text!=null && !text.isEmpty())){
@@ -251,7 +280,7 @@ public class LearningPanel extends Panel{
      /**
      * Method launched when Activity is completed
      */
-    private void launchOnCompleted(){
+    private void launchOnActivityCompleted(){
         
         try {
             
@@ -262,7 +291,7 @@ public class LearningPanel extends Panel{
             String text = Const.COMMON.getFinalText(currentActivityPanel.getActivity());
 
             if (Const.COMMON.isSpeechText(currentActivityPanel.getActivity())) {
-                Resources.speech(text);
+                Resources.speech(text,false);
             }
             
             Image image = null;
@@ -279,6 +308,10 @@ public class LearningPanel extends Panel{
             if((text!=null && !text.isEmpty()) || image!=null){
                 Dialogs.message(Const.COMMON.getTitle(currentActivityPanel.getActivity()),text,image);
             }
+            
+            if(Const.COMMON.isWaitUntilComplete(currentActivityPanel.getActivity())){
+                nextActivity();
+            }
 
         } catch (Exception e) {
             Log.debug("Error on launchOnCompleted method", e);
@@ -290,7 +323,15 @@ public class LearningPanel extends Panel{
      * Starts the learning panel
      */
     public void start(){
-        setCurrentActivity();
+        if(learning !=null && learning.getActivities()!=null && !learning.getActivities().isEmpty()){
+            setActivity(learning.getActivities().get(0));
+        }
+    }
+    
+    public void stop(){
+        if(currentActivityPanel!=null){
+            currentActivityPanel.stop();
+        }
     }
     
     
@@ -299,7 +340,7 @@ public class LearningPanel extends Panel{
         @Override
         public void state(int state) {
             if(state == Activity.COMPLETED){
-                launchOnCompleted();
+                launchOnActivityCompleted();
             }
         }
     }

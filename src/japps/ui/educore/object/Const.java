@@ -20,9 +20,11 @@ package japps.ui.educore.object;
 import japps.ui.educore.component.ChooseActivityPanel;
 import japps.ui.educore.component.ConnectActivityPanel;
 import japps.ui.educore.component.DnDActivityPanel;
+import japps.ui.educore.component.InputTextActivityPanel;
 import japps.ui.educore.component.InteractiveImageActivityPanel;
 import japps.ui.educore.component.MemoryActivityPanel;
 import japps.ui.educore.component.ReadActivityPanel;
+import japps.ui.util.Resources;
 import java.awt.Font;
 import java.nio.file.Path;
 
@@ -55,25 +57,34 @@ public class Const {
     public static final String FINAL_TEXT = "finalText";
     public static final String WAIT_UNTIL_COMPLETE = "waitUntilComplete";
     public static final String IMAGE = "image";
-    public static final String WIDTH = "image";
-    public static final String HEIGHT = "image";
+    public static final String WIDTH = "width";
+    public static final String HEIGHT = "height";
     public static final String HORIZONTAL = "horizontal";
+    public static final String EDUCORE_VERSION = "educoreVersion";
+    public static final String TOPICS = "topics";
+    public static final String INPUT = "input";
+    public static final String INPUT_NAME = "inputName";
+    public static final String MULTISELECTION = "multiselection";
     
     public static class LEARNING{
-        public static String    getTitle(ActivityOption activity){     return activity.get(    TITLE); }
-        public static boolean   isSpeechText(ActivityOption option){   return option.getBool(  SPEECH_TEXT);}
-        public static String    getText(ActivityOption option){        return option.get(      TEXT);}
-        public static String    getFinalText(ActivityOption option){   return option.get(      FINAL_TEXT);}
-        public static Path      getThumbnail(ActivityOption option){   return option.getPath(  THUMBNAIL);}
-        public static boolean   isWaitUntilComplete(ActivityOption o){ return o.getBool(WAIT_UNTIL_COMPLETE);}
+        public static String    getTitle(Learning activity){     return activity.get(    TITLE); }
+        public static boolean   isSpeechText(Learning option){   return option.getBool(  SPEECH_TEXT);}
+        public static String    getText(Learning option){        return option.get(      TEXT);}
+        public static String    getFinalText(Learning option){   return option.get(      FINAL_TEXT);}
+        public static Path      getThumbnail(Learning option){   return option.getPath(  THUMBNAIL);}
+        public static double    getEducoreVersion(Learning l){   return l.getDouble(EDUCORE_VERSION);}
+        public static String    getTopics(Learning l){         return l.get(TOPICS); }
         
-        public static void set(Learning learning, String title, String text, String finalText, Path thumbnail,boolean speechText , boolean waitUntilComplete){
+        
+        public static void set(Learning learning, String title, String text, String finalText, Path thumbnail,boolean speechText,String topics){
             learning.set(TITLE, title);
             learning.set(SPEECH_TEXT, speechText);
             learning.set(TEXT, text);
             learning.set(FINAL_TEXT, finalText);
             learning.set(THUMBNAIL, thumbnail);
-            learning.set(WAIT_UNTIL_COMPLETE, waitUntilComplete);
+            
+            learning.set(EDUCORE_VERSION,Resources.p("app.version"));
+            learning.set(TOPICS, topics);
         }
         
     }
@@ -84,14 +95,34 @@ public class Const {
         public static boolean   isSpeechText(ActivityOption option){   return option.getBool(SPEECH_TEXT);}
         public static Path      getSuccessImage(ActivityOption option){return option.getPath(  SUCCESS_IMAGE);}
         public static String    getFinalText(ActivityOption option){   return option.get(FINAL_TEXT);}
+        public static boolean   isWaitUntilComplete(Activity o){ return o.getBool(WAIT_UNTIL_COMPLETE);}
         
-        public static void activity(Activity activity, String title, String text, String finalText, Path successImage, boolean speechText){
+        public static void activity(Activity activity, String title, String text, String finalText, Path successImage, boolean speechText , boolean waitUntilComplete){
             activity.set(TITLE, title);
             activity.set(TEXT, text);
             activity.set(FINAL_TEXT, finalText);
             activity.set(SUCCESS_IMAGE, successImage);
             activity.set(SPEECH_TEXT,speechText);
+            activity.set(WAIT_UNTIL_COMPLETE, waitUntilComplete);
         }
+    }
+    
+    public static class INPUTTEXT extends COMMON{
+        
+        public static String getInput(ActivityOption o){ return o.get(INPUT);}
+        public static void setInput(ActivityOption o, String input){ o.set(INPUT, input);}
+        public static String getInputName(ActivityOption a){ return a.get(INPUT_NAME);}
+        public static Font getFont(ActivityOption o){ return o.getFont(FONT);}
+        
+        public static void activity(Activity a){ a.set(ACTIVITY_PANEL_CLASS, InputTextActivityPanel.class.getName());}
+        
+        public static void option(ActivityOption o, String text, String inputName, boolean speechText, Font font){
+            o.set(TEXT, text);
+            o.set(INPUT_NAME, inputName);
+            o.set(SPEECH_TEXT, speechText);
+            o.set(FONT, font);
+        }
+        
     }
     
     public static class DND extends COMMON{
@@ -295,6 +326,7 @@ public class Const {
         public static int       getMediaType(ActivityOption option){   return option.getInt(   MEDIA_TYPE);}
         public static String    getText(ActivityOption option){        return option.get(      TEXT);}
         public static boolean   isSpeechText(ActivityOption option){   return option.getBool(SPEECH_TEXT);}
+        public static boolean   isMultiselection(Activity a){          return a.getBool(MULTISELECTION);}
         
         /**
          * Set values to an activity option
@@ -315,12 +347,13 @@ public class Const {
             option.set(SPEECH_TEXT, speechText );
         }
         
-        public static void activity(Activity activity, int rows, int columns, int thumbnailWidth, int thumbnailHeight ){
+        public static void activity(Activity activity, int rows, int columns, int thumbnailWidth, int thumbnailHeight ,boolean multiselection){
             activity.set(ACTIVITY_PANEL_CLASS, ChooseActivityPanel.class.getName());
             activity.set(ROWS, rows);
             activity.set(COLUMNS, columns);
             activity.set(THUMBNAIL_WIDTH, thumbnailWidth);
             activity.set(THUMBNAIL_HEIGHT, thumbnailHeight);
+            activity.set(MULTISELECTION, multiselection);
         }
         
     }

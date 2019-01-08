@@ -101,9 +101,8 @@ public class Activity extends ActivityOption {
     public void setState(int state) {
         int oldstate = this.state;
         this.state = state;
-        if(oldstate != state){
-            fireActivityListener();
-        }   
+        this.setCompleted(this.state == COMPLETED);
+        this.fireActivityListener();
     }
     
     /**
@@ -162,6 +161,7 @@ public class Activity extends ActivityOption {
                 String optionIds[] = optionString.split("[,]");
                 for(String optionId : optionIds){
                     ActivityOption option = new ActivityOption(optionId.trim(), this.properties);
+                    option.parent = this;
                     options.add(option);
                 }
             }

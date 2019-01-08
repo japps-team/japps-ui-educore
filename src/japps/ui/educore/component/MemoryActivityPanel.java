@@ -70,7 +70,7 @@ public class MemoryActivityPanel extends ActivityPanel {
                 lastSelected = card;
                 
                 if (isSpeechText(card.option)) {
-                        Resources.speech(getText(card.option));
+                        Resources.speech(getText(card.option),true);
                  }
                 
             }else{
@@ -208,7 +208,7 @@ public class MemoryActivityPanel extends ActivityPanel {
                 card.frontImage = Util.readImage(getThumbnail(option)).getScaledInstance(cardWidth, cardHeight, Image.SCALE_SMOOTH);
                 card.button.setCommand(option.getId());
                 card.button.setBorder(BorderFactory.createEmptyBorder());
-                card.button.setAction((e) -> {
+                card.button.addActionListener((e) -> {
                     final int cardId = card.id;
                     String optionid = e.getActionCommand();
                     ActivityOption o = getActivity().getOptionById(optionid);

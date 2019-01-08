@@ -65,8 +65,7 @@ public class DnDActivityPanel extends ActivityPanel{
         scroll.setViewportView(leftPanel);
         scroll.setOpaque(false);
         scroll.setBorder(BorderFactory.createEmptyBorder());
-        leftPanel.setBorder(BorderFactory.createEmptyBorder());
-        rightPanel.setBorder(BorderFactory.createEmptyBorder());
+        scroll.getViewport().setBackground(Color.white);
         setComponents(new Component[][]{{scroll,rightPanel}}, 
                 new String[]{"250:250:250,"+Panel.FILL,Panel.FILL_GROW_CENTER}, new String[]{Panel.FILL_GROW_CENTER});
     }
@@ -116,9 +115,9 @@ public class DnDActivityPanel extends ActivityPanel{
             TB_ActivityOption b = new TB_ActivityOption();
             b.setOption(o);
             b.setDndMode(Dnd.DRAGGABLE);
-            b.setAction((e)->{
+            b.addActionListener((e)->{
                     String text = Const.DND.getText(o);
-                    Resources.speech(text);
+                    Resources.speech(text,false);
             });
             compsLeft[i][0]= b;
             i++;
